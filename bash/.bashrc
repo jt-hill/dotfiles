@@ -6,6 +6,7 @@
 [[ $- != *i* ]] && return
 
 export EDITOR=nvim
+export SUDO_EDITOR=nvim
 
 alias ls='ls --color=auto'
 alias la='ls -a'
