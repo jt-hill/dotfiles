@@ -28,7 +28,7 @@ set formatoptions=tcqrn1
 set hidden
 
 " Tabs and indenting
-set smartindent
+" set smartindent
 set tabstop=4
 set shiftwidth=4
 set softtabstop=4

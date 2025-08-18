@@ -19,6 +19,7 @@ else
 	vim.o.expandtab = true
 	vim.o.ignorecase = true
 	vim.o.smartcase = true
+    vim.cmd('syntax on')
     --require("kickstart")
 end
 

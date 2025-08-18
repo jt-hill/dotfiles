@@ -1,0 +1,2 @@
+alias lvim="NVIM_APPNAME=lazyvim nvim"
+alias nv="nvim"

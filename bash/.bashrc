@@ -23,4 +23,6 @@ shopt -s globstar
 export GEM_HOME="$HOME/gems"
 export PATH="$HOME/gems/bin:$PATH"
 
+source ~/.config/shell/nvim-aliases
+
 PS1='[\u@\h \W]\$ '
