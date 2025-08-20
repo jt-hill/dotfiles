@@ -13,6 +13,7 @@ alias la='ls -a'
 alias ll='ls -l'
 alias lla='la -l'
 alias grep='rg --color=auto'
+alias dots='cd ~/.dotfiles'
 
 shopt -s autocd
 shopt -s cdspell
