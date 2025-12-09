@@ -18,6 +18,19 @@ set $term kitty
 # Your preferred application launcher
 set $menu rofi -show drun
 
+### Theme setup - Breeze + Qt bridge
+set $gnome-schema org.gnome.desktop.interface
+
+exec_always {
+    gsettings set $gnome-schema gtk-theme 'Breeze'
+    gsettings set $gnome-schema icon-theme 'breeze'
+}
+
+# Critical: Qt apps need this to respect gsettings
+set $QT_QPA_PLATFORMTHEME gnomeplatform
+
+exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
+
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
@@ -42,6 +55,12 @@ output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
 # your displays after another 300 seconds, and turn your screens back on when
 # resumed. It will also lock your screen before your computer goes to sleep.
 
+exec nm-applet --indicator
+exec blueman-applet
+exec dunst
+exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+exec ckb-next -b
+
 ### Input configuration
 #
 # Example configuration:
@@ -59,7 +78,11 @@ output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
 #
 # You can also configure each device individually.
 # Read `man 5 sway-input` for more information about this section.
-
+    input type:pointer {
+        accel_profile adaptive        # flat or adaptive
+        pointer_accel -0.55           # Range: -1.0 to 1.0 (negative = slower)
+    }
+    input type:keyboard xkb_numlock enabled
 ### Key bindings
 #
 # Basics:

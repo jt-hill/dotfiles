@@ -12,7 +12,7 @@
     { "keys": ["n"], "type": "function", "command": "next_link" },
     { "keys": ["b"], "type": "function", "command": "previous_link" },
     { "keys": ["o"], "type": "function", "command": "open_link" },
-    { "keys": ["CONTROL_/"], "type": "function", "command": "toggle_console" },
+    { "keys": ["tc"], "type": "function", "command": "toggle_console" },
     { "keys": ["tm"], "type": "function", "command": "toggle_metadata" },
     { "keys": ["/"], "type": "prompt", "command": "search \"\"", "cursorPosition": -2 },
     { "keys": ["mn"], "type": "prompt", "command": "mknote \"\"", "cursorPosition": -2 },
