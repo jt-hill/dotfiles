@@ -205,7 +205,7 @@ set $powermenu ~/.config/sway/scripts/power_menu.sh
     bindsym $mod+n exec thunar
 
     # Launch the browser
-    bindsym $mod+o exec firefox
+    bindsym $mod+o exec app.zen_browser.zen
 
     # Launch the clipboard manager
     bindsym $mod+Ctrl+v exec cliphist list | fuzzel -d -w 90 -l 30 -p "Select an entry to copy it to your clipboard buffer:"| cliphist decode | wl-copy

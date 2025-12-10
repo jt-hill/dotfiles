@@ -10,7 +10,7 @@ window {
   background-color: black;
 }
 #clock-label {
-  font-family: JetBrainsMono;
+  font-family: NotoMono;
   font-size: 64.0px;
 }
 #unlock-button {

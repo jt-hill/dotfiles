@@ -16,8 +16,13 @@ exec_always swayidle -w before-sleep "gtklock -d"
 exec mako
 
 # corsair keyboard driver
-exec ckb-next
-
+exec ckb-next -b
+# Auto-mount USB drives
+exec udiskie --tray                    
+# WiFi
+exec nm-applet --indicator             
+# bluetooth
+exec blueman-applet        
 # Autotiling
 exec autotiling
 
