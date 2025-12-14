@@ -7,7 +7,6 @@
 
 export EDITOR=nvim
 export SUDO_EDITOR=nvim
-export QT_QPA_PLATFORMTHEME=gnomeplatform
 
 alias ls='ls --color=auto'
 alias la='ls -a'

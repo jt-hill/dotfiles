@@ -1,4 +1,8 @@
 ### Output configuration
+
+# scale thinkpad output to 1.75x
+output eDP-1 scale 1.75
+
 #
 # Example configuration:
 #

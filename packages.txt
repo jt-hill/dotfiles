@@ -7,6 +7,8 @@ cliphist
 egl-wayland
 file-roller
 fuzzel
+gnome-themes-extra
+gnome-keyring
 greetd
 greetd-regreet
 grim
@@ -23,15 +25,18 @@ gvfs-smb
 htop
 jq
 kitty
+lf
 mako
 network-manager-applet
 neovim
 nwg-drawer
 nwg-look
+okular
 pamixer
 polkit-gnome
 ripgrep
 slurp
+stow
 swappy
 sway
 swaybg
