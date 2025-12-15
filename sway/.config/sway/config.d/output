@@ -2,6 +2,11 @@
 
 # scale thinkpad output to 1.75x
 output eDP-1 scale 1.75
+# set desktop scale to 1.1x
+output DP-1 scale 1.1
+
+# better fractional scaling rendering
+output * scale_filter smart
 
 #
 # Example configuration:

@@ -25,6 +25,7 @@ gvfs-smb
 htop
 jq
 kitty
+kvantum
 lf
 mako
 network-manager-applet
@@ -34,6 +35,7 @@ nwg-look
 okular
 pamixer
 polkit-gnome
+qt6ct
 ripgrep
 slurp
 stow

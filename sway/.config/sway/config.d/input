@@ -2,6 +2,15 @@
 #
 # Read `man 5 sway-input` for more information about this section.
 
+# Mouse configuration
+input type:pointer {
+    accel_profile adaptive
+    pointer_accel -0.4
+    dwt enabled
+    tap enabled
+    natural_scroll disabled
+}
+
 # Touchpad configuration
 input type:touchpad {
     accel_profile adaptive

@@ -14,6 +14,7 @@ exec_always swayidle -w before-sleep "gtklock -d"
 
 # Desktop notifications
 exec mako
+exec joplin-desktop
 
 # corsair keyboard driver
 exec ckb-next -b
