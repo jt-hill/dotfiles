@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set the font
-font="JetBrainsMono"
+font="NotoMono"
 
 cheat=(
   --title="Sway keybindings:"

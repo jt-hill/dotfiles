@@ -59,3 +59,4 @@ wl-clipboard
 xdg-desktop-portal-wlr
 xed
 xorg-xwayland
+yad
