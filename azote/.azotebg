@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-pkill swaybg
-swaybg -o 'eDP-1' -i "/home/jth/.dotfiles/sway/.config/sway/EndeavourOS_SpaceStation__3840x2160.png" -m fill &

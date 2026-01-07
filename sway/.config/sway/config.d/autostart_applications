@@ -14,6 +14,8 @@ exec_always swayidle -w before-sleep "gtklock -d"
 
 # Desktop notifications
 exec mako
+
+# Joplin desktop sync (set background start in app)
 exec joplin-desktop
 
 # corsair keyboard driver
@@ -26,6 +28,9 @@ exec nm-applet --indicator
 exec blueman-applet        
 # Autotiling
 exec autotiling
+# gnome-keyring service
+exec eval $(gnome-keyring-daemon --start)
+exec export SSH_AUTH_SOCK
 
 # cliphist
 exec wl-paste --type text --watch cliphist store
