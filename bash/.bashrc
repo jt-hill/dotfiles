@@ -14,6 +14,7 @@ alias ll='ls -l'
 alias lla='la -l'
 alias grep='rg --color=auto'
 alias dots='cd ~/.dotfiles'
+alias ds='source ~/.local/share/venvs/datascience/bin/activate'
 
 shopt -s autocd
 shopt -s cdspell
@@ -27,3 +28,6 @@ export PATH="$HOME/gems/bin:$PATH"
 source ~/.config/shell/nvim-aliases
 
 PS1='[\u@\h \W]\$ '
+
+# uv
+export PATH="/home/jth/.local/bin:$PATH"
