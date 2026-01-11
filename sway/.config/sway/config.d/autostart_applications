@@ -8,6 +8,7 @@ exec systemctl --user import-environment DISPLAY WAYLAND_DISPLAY SWAYSOCK
 exec hash dbus-update-activation-environment 2>/dev/null && \
      dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY SWAYSOCK
 
+exec systemctl --user set-environment XDG_CURRENT_DESKTOP=sway:GNOME
 # Idle configuration
 exec swayidle idlehint 1
 exec_always swayidle -w before-sleep "gtklock -d"
