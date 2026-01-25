@@ -10,7 +10,7 @@ confirm_action() {
 
 case $SELECTION in
 *"󰌾 Lock"*)
-  gtklock
+  hyprlock
   ;;
 *"󰤄 Suspend"*)
   systemctl suspend
@@ -22,7 +22,7 @@ case $SELECTION in
   ;;
 *"󰍃 Log out"*)
   if confirm_action "Log out"; then
-    swaymsg exit
+    hyprctl dispatch exit
   fi
   ;;
 *" Reboot"*)
