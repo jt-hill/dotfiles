@@ -7,6 +7,7 @@
 
 export EDITOR=nvim
 export SUDO_EDITOR=nvim
+export PATH="$HOME/.local/bin:$PATH"
 
 alias ls='ls --color=auto'
 alias la='ls -a'
