@@ -48,6 +48,7 @@ ZSH_AUTOSUGGEST_STRATEGY=(history completion)  # try history first, then complet
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'         # gray suggestions (adjust if hard to see)
 bindkey '^[[C' forward-char                     # right arrow accepts suggestion (fish-style)
 bindkey '^F' forward-word                       # ctrl+f accepts next word
+bindkey -v
 
 # --- Better history search (ctrl+r) ---
 autoload -Uz history-search-end

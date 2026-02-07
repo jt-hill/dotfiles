@@ -1,0 +1,58 @@
+enable repos:
+- sudo dnf install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm 
+- sudo dnf install https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+
+- flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+- sudo dnf copr enable ashbuk/Hyprland-Fedora 
+- sudo dnf copr enable dejan/lazygit
+
+install foundational packages:
+- git
+- stow
+- zsh
+- kitty
+
+main packages
+- fuse-libs
+- hyprland
+- yad
+- nwg-drawer
+- nwg-look
+- mako
+- Thunar
+- swappy
+- (nerd fonts)
+- kvantum
+- flatseal
+
+laptop stuff
+- powertop
+- tlp
+- tlp-rdw
+
+~ % sudo systemctl enable --now tlp
+
+lazyvim
+- neovim
+- fd
+- fzf
+- lua-5.1 (compat-lua)
+- luarocks
+
+- helix
+
+dev environments
+- pip
+- uv
+- rustup
+- ruby 
+  - ruby-devel 
+  - openssl-devel
+  - jredhat-rpm-config 
+  - gcc-c++
+- @development-tools
+stow settings
+
+enable hyprland
+
+set user shell to zsh
