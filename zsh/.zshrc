@@ -65,8 +65,8 @@ alias ...='cd ../..'
 
 # --- Prompt (simple, fast) ---
 setopt PROMPT_SUBST
-autoload -Uz vcs_info
-precmd() { vcs_info }
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd vcs_info
 zstyle ':vcs_info:git:*' formats ' %F{cyan}(%b)%f'
 PROMPT='%F{blue}%~%f${vcs_info_msg_0_} %# '
 
