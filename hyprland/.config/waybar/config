@@ -85,7 +85,7 @@
         "cpu",
         "memory",
         "backlight",
-        "pulseaudio",
+        "wireplumber",
         "battery",
         "tray",
         "custom/power"
@@ -139,7 +139,7 @@
         "on-scroll-up": "brightnessctl -c backlight set +5%"
     },
 
-    "pulseaudio": {
+    "wireplumber": {
         "scroll-step": 2,
         "format": "{icon} {volume}%",
         "format-muted":"󰝟 muted",
@@ -152,7 +152,7 @@
             "car": "",
             "default": ["󰕿", "󰖀", "󰕾"]
         },
-        "on-click": "pavucontrol"
+        "on-click": "pwvucontrol"
     },
 
     "battery": {

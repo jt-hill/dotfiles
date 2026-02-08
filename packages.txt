@@ -1,7 +1,7 @@
 acpi
-autotiling
 awesome-terminal-fonts
 azote
+blueman
 brightnessctl
 cliphist
 egl-wayland
@@ -13,9 +13,6 @@ greetd
 greetd-regreet
 grim
 gtk-layer-shell
-gtklock
-gtklock-powerbar-module
-gtklock-userinfo-module
 gvfs
 gvfs-afc
 gvfs-gphoto2
@@ -43,10 +40,8 @@ ripgrep
 slurp
 stow
 swappy
-sway
 swaybg
 sway-contrib
-swayidle
 sysstat
 thunar
 thunar-archive-plugin
@@ -60,7 +55,7 @@ ttf-ubuntu-font-family
 waybar
 wayland-protocols
 wl-clipboard
-xdg-desktop-portal-wlr
+xdg-desktop-portal-hyprland
 xed
 xorg-xwayland
 yad
