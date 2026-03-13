@@ -16,6 +16,7 @@ alias lla='la -l'
 alias grep='rg --color=auto'
 alias dots='cd ~/.dotfiles'
 alias ds='source ~/.local/share/venvs/datascience/bin/activate'
+bindkey -v
 
 # install ruby gems to ~/gems
 export GEM_HOME="$HOME/gems"
