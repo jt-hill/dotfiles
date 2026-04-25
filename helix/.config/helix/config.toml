@@ -1,0 +1,63 @@
+theme = "tokyonight"
+
+[editor]
+line-number = "relative"
+mouse = true
+cursorline = true
+auto-save = true
+bufferline = "multiple"
+color-modes = true
+
+[editor.cursor-shape]
+insert = "bar"
+normal = "block"
+select = "underline"
+
+[editor.file-picker]
+hidden = false
+
+[editor.lsp]
+display-messages = true
+display-inlay-hints = true
+
+[editor.indent-guides]
+render = true
+
+[editor.statusline]
+left = ["mode", "spinner", "file-name", "file-modification-indicator"]
+right = ["diagnostics", "selections", "register", "position", "file-encoding"]
+
+[keys.normal]
+# Clear search highlight with Escape (like your nvim <Esc> -> nohlsearch)
+"esc" = ["collapse_selection", "keep_primary_selection"]
+
+# Split navigation with Ctrl+hjkl (matching your nvim config)
+"C-h" = "jump_view_left"
+"C-j" = "jump_view_down"
+"C-k" = "jump_view_up"
+"C-l" = "jump_view_right"
+
+[keys.normal.space]
+# File/buffer pickers (matching your <leader>sf, <leader>sg, <leader>/)
+"f" = "file_picker"              # <leader>sf -> space f
+"F" = "file_picker_in_current_buffer_directory"
+"/" = "global_search"            # <leader>sg -> space /
+"space" = "buffer_picker"        # <leader><leader> -> space space
+
+# Diagnostics (matching your <leader>e, <leader>q)
+"e" = "diagnostics_picker"       # <leader>e
+"q" = "diagnostics_picker"       # <leader>q
+
+# LSP actions (matching your <leader>rn, <leader>ca)
+"r" = { "n" = "rename_symbol" }  # <leader>rn
+"c" = { "a" = "code_action" }    # <leader>ca
+
+# Document/workspace symbols (matching your <leader>ds, <leader>ws)
+"d" = { "s" = "symbol_picker" }  # <leader>ds
+"w" = { "s" = "workspace_symbol_picker" }  # <leader>ws
+
+# Format (matching your <leader>f — but we use F since f is file_picker)
+"l" = { "f" = ":format" }        # alternative: space l f to format
+
+[keys.insert]
+k = { j = "normal_mode" }  # kj to exit insert mode, matching your nvim config

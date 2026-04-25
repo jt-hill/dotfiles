@@ -13,7 +13,6 @@ alias ls='ls --color=auto'
 alias la='ls -a'
 alias ll='ls -l'
 alias lla='la -l'
-alias grep='rg --color=auto'
 alias dots='cd ~/.dotfiles'
 alias ds='source ~/.local/share/venvs/datascience/bin/activate'
 bindkey -v

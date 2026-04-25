@@ -1,0 +1,35 @@
+# Language server configuration
+# Helix auto-detects installed LSPs — just make sure they're on your PATH
+
+[[language]]
+name = "python"
+language-servers = ["pyright"]
+auto-format = true
+
+[[language]]
+name = "typescript"
+auto-format = true
+
+[[language]]
+name = "javascript"
+auto-format = true
+
+[[language]]
+name = "json"
+auto-format = true
+
+[[language]]
+name = "toml"
+auto-format = true
+
+[[language]]
+name = "yaml"
+auto-format = true
+
+[[language]]
+name = "bash"
+auto-format = true
+
+[[language]]
+name = "markdown"
+auto-format = true
