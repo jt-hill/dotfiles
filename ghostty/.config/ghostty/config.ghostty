@@ -1,0 +1,10 @@
+shell-integration = zsh
+gtk-single-instance = false
+working-directory = home
+window-inherit-working-directory = true
+
+keybind = ctrl+shift+k=clear_screen
+
+theme = light:Catppuccin Latte,dark:TokyoNight Night
+
+window-decoration = none

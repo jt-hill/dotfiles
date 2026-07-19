@@ -3,7 +3,7 @@
 
 # --- Personal Customizations ---
 # If not running interactively, don't do anything
-# [[ $- != *i* ]] && return
+[[ $- != *i* ]] && return
 
 export EDITOR=nvim
 export SUDO_EDITOR=nvim
@@ -32,9 +32,18 @@ setopt HIST_REDUCE_BLANKS     # trim whitespace
 setopt INC_APPEND_HISTORY     # write immediately
 
 # --- Completion ---
-autoload -Uz compinit && compinit
 zstyle ':completion:*' menu select                 # arrow-key menu
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}' # case-insensitive
+
+lazy_complete() {
+    autoload -Uz compinit
+    compinit -C
+    bindkey -M viins '^I' expand-or-complete
+    zle expand-or-complete
+}
+
+zle -N lazy_complete
+bindkey -M viins '^I' lazy_complete
 
 # --- Plugins (fish-like behavior) ---
 PLUGIN_DIR="${ZDOTDIR:-$HOME}/.zsh/plugins"
@@ -66,9 +75,40 @@ alias ...='cd ../..'
 # --- Prompt (simple, fast) ---
 setopt PROMPT_SUBST
 autoload -Uz add-zsh-hook
-add-zsh-hook precmd vcs_info
-zstyle ':vcs_info:git:*' formats ' %F{cyan}(%b)%f'
-PROMPT='%F{blue}%~%f${vcs_info_msg_0_} %# '
+
+update_git_prompt() {
+    local dir=$PWD gitdir gitdir_spec head branch
+
+    while [[ $dir != / ]]; do
+        if [[ -d $dir/.git ]]; then
+            gitdir=$dir/.git
+            break
+        elif [[ -f $dir/.git ]]; then
+            IFS= read -r gitdir_spec < $dir/.git
+            gitdir=${gitdir_spec#gitdir: }
+            [[ $gitdir != /* ]] && gitdir=$dir/$gitdir
+            break
+        fi
+        dir=${dir:h}
+    done
+
+    if [[ -z $gitdir || ! -r $gitdir/HEAD ]]; then
+        git_prompt=
+        return
+    fi
+
+    IFS= read -r head < $gitdir/HEAD
+    if [[ $head == 'ref: refs/heads/'* ]]; then
+        branch=${head#ref: refs/heads/}
+    else
+        branch=${head[1,7]}
+    fi
+
+    git_prompt=" %F{cyan}(${branch})%f"
+}
+
+add-zsh-hook precmd update_git_prompt
+PROMPT='%F{blue}%~%f${git_prompt} %# '
 
 # --- Optional: z for directory jumping ---
 # Uncomment if you install zoxide: eval "$(zoxide init zsh)"
