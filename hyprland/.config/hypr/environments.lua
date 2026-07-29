@@ -1,0 +1,35 @@
+-- Environment variables for Wayland compatibility.
+
+local environment = {
+    XDG_CURRENT_DESKTOP = "Hyprland",
+    XDG_SESSION_TYPE = "wayland",
+    XDG_SESSION_DESKTOP = "Hyprland",
+
+    QT_QPA_PLATFORM = "wayland;xcb",
+    QT_QPA_PLATFORMTHEME = "qt6ct",
+    QT_WAYLAND_DISABLE_WINDOWDECORATION = "1",
+    QT_AUTO_SCREEN_SCALE_FACTOR = "1",
+
+    GDK_SCALE = "1",
+    MOZ_ENABLE_WAYLAND = "1",
+    XCURSOR_SIZE = "24",
+    APPIMAGELAUNCHER_DISABLE = "1",
+
+    OZONE_PLATFORM = "wayland",
+    ELECTRON_OZONE_PLATFORM_HINT = "auto",
+}
+
+for name, value in pairs(environment) do
+    hl.env(name, value)
+end
+
+-- Optional compatibility variables retained from the legacy configuration:
+--
+-- hl.env("WLR_NO_HARDWARE_CURSORS", "1")
+-- hl.env("WLR_RENDERER_ALLOW_SOFTWARE", "1")
+--
+-- hl.env("LIBVA_DRIVER_NAME", "nvidia")
+-- hl.env("GBM_BACKEND", "nvidia-drm")
+-- hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
+-- hl.env("__GL_VRR_ALLOWED", "1")
+-- hl.env("WLR_DRM_NO_ATOMIC", "1")

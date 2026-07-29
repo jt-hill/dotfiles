@@ -10,7 +10,7 @@
 
     "modules-left": [
         "custom/launcher",
-        "hyprland/workspaces",
+        "ext/workspaces",
         "hyprland/window"
     ],
 
@@ -20,11 +20,16 @@
         "tooltip": false
     },
 
-    "hyprland/workspaces": {
-        "disable-scroll": true,
+    // Waybar 0.15's Hyprland module still sends legacy `dispatch workspace`
+    // commands. The ext-workspace protocol works with Hyprland's Lua config.
+    "ext/workspaces": {
         "all-outputs": true,
+        "sort-by-name": true,
+        "on-click": "activate",
         "format": "{icon}",
         "format-icons": {
+            "1": "1",
+            "2": "2",
             "3": "3",
             "4": "4",
             "5": "5",

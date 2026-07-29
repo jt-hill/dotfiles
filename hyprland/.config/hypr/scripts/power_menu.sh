@@ -22,7 +22,7 @@ case $SELECTION in
   ;;
 *"󰍃 Log out"*)
   if confirm_action "Log out"; then
-    hyprctl dispatch exit
+    hyprctl dispatch 'hl.dsp.exit()'
   fi
   ;;
 *" Reboot"*)

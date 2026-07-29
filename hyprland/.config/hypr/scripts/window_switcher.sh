@@ -23,5 +23,5 @@ row=$(echo "$formatted_output" | fuzzel --dmenu --width=80 --lines=12)
 if [ -n "$row" ]; then
     addr="${row##*(}"
     addr="${addr%%)*}"
-    hyprctl dispatch focuswindow address:$addr
+    hyprctl dispatch "hl.dsp.focus({ window = \"address:$addr\" })"
 fi

@@ -49,20 +49,31 @@ stop_inhibit() {
 focus_monitor() {
     local mon="$1"
     # Move cursor and focus to the target monitor
-    hyprctl dispatch focusmonitor "$mon"
+    hyprctl dispatch "hl.dsp.focus({ monitor = \"$mon\" })"
     # Ensure workspace 1 is active and focused on primary
-    hyprctl dispatch workspace 1
+    hyprctl dispatch 'hl.dsp.focus({ workspace = "1" })'
+}
+
+move_existing_workspaces() {
+    local target="$1"
+    local first="$2"
+    local last="$3"
+    local workspace
+
+    while read -r workspace; do
+        if ((workspace >= first && workspace <= last)); then
+            hyprctl dispatch "hl.dsp.workspace.move({ workspace = \"$workspace\", monitor = \"$target\" })"
+        fi
+    done < <(hyprctl monitors -j | jq -r '.[].activeWorkspace.id')
 }
 
 set_docked() {
     start_inhibit
 
     # Disable laptop display, all workspaces on external
-    hyprctl keyword monitor "eDP-1, disable"
+    hyprctl eval 'hl.monitor({ output = "eDP-1", disabled = true })'
 
-    for i in $(seq 1 10); do
-        hyprctl dispatch moveworkspacetomonitor "$i DP-1"
-    done
+    move_existing_workspaces DP-1 1 10
 
     focus_monitor DP-1
 
@@ -75,16 +86,12 @@ set_meeting() {
 
     # Enable laptop display below external
     # External at top (0,0), laptop below it
-    hyprctl keyword monitor "DP-1, 2560x1440@120, 0x0, 1.07"
-    hyprctl keyword monitor "eDP-1, preferred, 0x1440, 1.666667"
+    hyprctl eval 'hl.monitor({ output = "DP-1", mode = "2560x1440@120", position = "0x0", scale = 1.07 })'
+    hyprctl eval 'hl.monitor({ output = "eDP-1", mode = "preferred", position = "0x1440", scale = 1.666667 })'
 
     # Split workspaces: 1-5 external, 6-10 laptop
-    for i in $(seq 1 5); do
-        hyprctl dispatch moveworkspacetomonitor "$i DP-1"
-    done
-    for i in $(seq 6 10); do
-        hyprctl dispatch moveworkspacetomonitor "$i eDP-1"
-    done
+    move_existing_workspaces DP-1 1 5
+    move_existing_workspaces eDP-1 6 10
 
     focus_monitor DP-1
 
@@ -96,11 +103,9 @@ set_laptop() {
     stop_inhibit
 
     # Laptop display only, all workspaces on eDP-1
-    hyprctl keyword monitor "eDP-1, preferred, auto, 1.666667"
+    hyprctl eval 'hl.monitor({ output = "eDP-1", mode = "preferred", position = "auto", scale = 1.666667 })'
 
-    for i in $(seq 1 10); do
-        hyprctl dispatch moveworkspacetomonitor "$i eDP-1"
-    done
+    move_existing_workspaces eDP-1 1 10
 
     focus_monitor eDP-1
 

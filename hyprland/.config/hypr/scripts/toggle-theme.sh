@@ -1,15 +1,32 @@
 #!/bin/bash
-# Toggle between light and dark themes
+# Toggle between light and dark themes.
 
-CONFIG_DIR="$HOME/.config/hypr"
-CURRENT=$(readlink "$CONFIG_DIR/colors.conf")
+CURRENT=$(gsettings get org.gnome.desktop.interface color-scheme)
 
-if [[ "$CURRENT" == "colors-dark.conf" ]]; then
-    ln -sf colors-light.conf "$CONFIG_DIR/colors.conf"
+if [[ "$CURRENT" == *"prefer-dark"* ]]; then
     gsettings set org.gnome.desktop.interface color-scheme 'prefer-light'
+    ACTIVE_BORDER="rgba(5c6a72ff)"
+    INACTIVE_BORDER="rgba(a6b0a0ff)"
+    SHADOW_COLOR="rgba(9da9a066)"
 else
-    ln -sf colors-dark.conf "$CONFIG_DIR/colors.conf"
     gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+    ACTIVE_BORDER="rgba(6272A4ff)"
+    INACTIVE_BORDER="rgba(44475Aff)"
+    SHADOW_COLOR="rgba(1a1a1aee)"
 fi
 
-hyprctl reload
+hyprctl eval "
+hl.config({
+    general = {
+        col = {
+            active_border = \"$ACTIVE_BORDER\",
+            inactive_border = \"$INACTIVE_BORDER\",
+        },
+    },
+    decoration = {
+        shadow = {
+            color = \"$SHADOW_COLOR\",
+        },
+    },
+})
+"
