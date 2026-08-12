@@ -1,148 +1,244 @@
-# dotfiles to make things the way I like them
+# Fedora workstation dotfiles
 
-## neovim + lazyvim
+Personal configuration for a Fedora 44 workstation running COSMIC. Fedora and
+COSMIC provide almost all of the desktop defaults; this repository now mainly
+contains shell/editor configuration, TPM-backed root-disk unlock, and the ASUS
+PG278Q dock workaround.
 
-lazyvim has some requirements, of which the most important is tree-sitter
+The `hyprland/`, `sway/`, and related desktop directories are retained as legacy
+configuration. They are not required for the current COSMIC setup.
+
+## Bootstrap
+
+Install the small set of tools used by the active configuration:
 
 ```bash
-sudo pacman -S neovim
-sudo pacman -S git rg fd fzf curl unzip tar
-sudo pacman -S lazygit tree-sitter tree-sitter-cli
+sudo dnf install git stow zsh neovim ripgrep fd-find fzf tree-sitter-cli
 ```
 
-```bash
-# launch neovim with minimal config 
-nvim
+Clone the repository into `~/.dotfiles`, then use GNU Stow for only the packages
+needed on the machine:
 
-# launch neovim with lazyvim config
-lvim 
+```bash
+git clone git@github.com:jt-hill/dotfiles.git ~/.dotfiles
+cd ~/.dotfiles
+
+stow zsh shell nvim lazyvim
 ```
 
-## sway + breeze
+Other directories can be stowed individually when their corresponding
+application is installed; for example, `stow ghostty`.
 
-### Sway setup
+The two Neovim configurations can coexist:
 
 ```bash
-# Core Sway
-sudo pacman -S sway waybar swaybg swaylock swayidle kitty rofi
-
-# System utilities
-sudo pacman -S network-manager-applet blueman pavucontrol brightnessctl
-sudo pacman -S pamixer playerctl grim slurp dunst
-
-# Breeze theme + Qt bridge
-sudo pacman -S breeze breeze-gtk breeze-icons
-sudo pacman -S qt5ct qt6ct kvantum
-
-# XDG portal for theme switching
-sudo pacman -S xdg-desktop-portal-gtk xdg-desktop-portal-wlr
-
-# Polkit agent (for password prompts)
-sudo pacman -S polkit-gnome
-
-# Optional but recommended
-sudo pacman -S wl-clipboard noto-fonts noto-fonts-emoji
+nvim  # minimal configuration
+lvim  # LazyVim via NVIM_APPNAME=lazyvim
 ```
 
-**Make theme-toggle executable:**
+## Boot Fedora without the GRUB delay
 
-   ```bash
-   chmod +x ~/.local/bin/theme-toggle
-   ```
-
-## ASUS PG278Q via Thunderbolt dock (EDID override)
-
-### The problem
-
-The PG278Q shows up at 640x480 (small centered box) when connected through a
-Thunderbolt dock, even though the same dock + monitor + cable works fine on
-Windows. The kernel detects the DP connector as `connected` but reads zero bytes
-of EDID.
-
-### Why this happens
-
-The dock hardware is not at fault — it passes EDID correctly (confirmed by
-testing with a Windows laptop through the same dock). The issue is the i915
-driver's DDC/I2C-over-AUX transaction failing silently when tunneled through
-Thunderbolt. Evidence:
-
-- `CONFIG_DRM_I915_DP_TUNNEL=y` is set and the TB link is established at full
-  speed (40 Gb/s USB4), so the tunnel infrastructure is present.
-- The DP connector shows `status: connected` in sysfs, meaning link training
-  succeeds — only the EDID read fails.
-- The kernel produces zero log messages about EDID failures; the AUX read
-  returns empty rather than erroring.
-- The DP AUX devices (`/dev/drm_dp_aux*`) exist and map correctly to DDI
-  outputs.
-
-This appears to be a known class of i915 bugs with Comet Lake (CML) and
-Thunderbolt DP tunneling. Relevant upstream references:
-
-- i915 DP tunnel support was added in kernel 6.9 (see `CONFIG_DRM_I915_DP_TUNNEL`)
-- Ongoing TB DP tunnel work: https://gitlab.freedesktop.org/drm/i915/kernel/-/issues?label_name=Thunderbolt
-- General EDID-over-TB issues: https://gitlab.freedesktop.org/drm/i915/kernel/-/issues?label_name=EDID
-
-This may be fixed in a future kernel. Adding `drm.debug=0x1e` to the kernel
-cmdline will produce verbose DP AUX transaction logs if you want to file a bug.
-
-### The workaround
-
-Force-load a custom EDID via kernel parameter. A pre-built EDID binary lives at
-`hyprland/.config/hypr/edid/pg278q.bin` with DTDs for 120Hz (primary) and 60Hz
-(fallback), generated using standard CVT Reduced Blanking timings.
+Install the tracked GRUB defaults and regenerate Fedora's real GRUB
+configuration. `GRUB_DEFAULT=0` selects the first entry (Fedora's latest
+kernel), while a hidden zero-second timeout boots it immediately:
 
 ```bash
-# Install the EDID firmware where the kernel can find it
-sudo mkdir -p /lib/firmware/edid
-sudo cp hyprland/.config/hypr/edid/pg278q.bin /lib/firmware/edid/pg278q.bin
+sudo install -Dm644 etc/default/grub /etc/default/grub
+sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+```
 
-# Add the kernel parameter (adjust DP-1 if your connector differs)
-# Append to /etc/kernel/cmdline:
-#   drm.edid_firmware=DP-1:edid/pg278q.bin
+Use the computer's UEFI boot menu if another operating system needs to be
+started. To restore the visible GRUB menu, change `GRUB_TIMEOUT` to a positive
+number and regenerate `/boot/grub2/grub.cfg`.
 
-# Rebuild UKI and reboot
-sudo mkinitcpio -P
+## Unlock the encrypted root disk with TPM2
+
+This workstation's root file system is in the LUKS2 volume on
+`/dev/nvme0n1p3`. Enroll an additional key sealed to PCR 7
+(`secure-boot-policy`). The TPM will release it while Secure Boot is enabled
+with the same UEFI trust databases. Disabling Secure Boot, clearing the TPM, or
+changing PK, KEK, db, or dbx will fall back to the existing LUKS passphrase.
+
+Do not remove the passphrase slot. It is the recovery path if the TPM or Secure
+Boot policy changes.
+
+### Check and enroll
+
+Confirm the assumptions first:
+
+```bash
+mokutil --sb-state
+systemd-cryptenroll --tpm2-device=list
+lsblk -f
+sudo cryptsetup luksDump /dev/nvme0n1p3
+```
+
+The expected results are Secure Boot enabled, one TPM2 device, and LUKS version
+2 with at least one passphrase key slot. Back up the LUKS header before adding a
+token, install the dracut rule, and enroll PCR 7 explicitly:
+
+```bash
+luks_header_backup="/root/luks-root-header-before-tpm-$(date +%F-%H%M%S).img"
+sudo cryptsetup luksHeaderBackup /dev/nvme0n1p3 \
+  --header-backup-file "$luks_header_backup"
+sudo chmod 600 "$luks_header_backup"
+printf 'LUKS header backup: %s\n' "$luks_header_backup"
+
+sudo install -Dm644 etc/dracut.conf.d/20-tpm2-root.conf \
+  /etc/dracut.conf.d/20-tpm2-root.conf
+
+sudo systemd-cryptenroll \
+  --wipe-slot=tpm2 \
+  --tpm2-device=auto \
+  --tpm2-pcrs=secure-boot-policy \
+  /dev/nvme0n1p3
+```
+
+`systemd-cryptenroll` asks for the current LUKS passphrase. `--wipe-slot=tpm2`
+only replaces an older systemd TPM token; it does not wipe passphrase slots.
+
+Install the tracked root-volume configuration. It preserves the Fedora
+installer's existing options and adds `tpm2-device=auto`:
+
+```bash
+sudo install -m600 etc/crypttab /etc/crypttab
+```
+
+The installed entry is:
+
+```text
+luks-73990c49-c04a-4212-b1fb-2357d7e1ab8f UUID=73990c49-c04a-4212-b1fb-2357d7e1ab8f none discard,x-initrd.attach,tpm2-device=auto
+```
+
+The PCR selection is stored in the LUKS2 token metadata, so it does not need to
+be repeated in `crypttab`. Rebuild the current initramfs only after both the
+dracut rule and `crypttab` are in place:
+
+```bash
+sudo dracut --force --kver "$(uname -r)"
+```
+
+### Verify and test
+
+Before rebooting, verify that the token is bound to PCR 7 and that the initramfs
+contains TPM support and the updated `crypttab`:
+
+```bash
+sudo cryptsetup luksDump /dev/nvme0n1p3
+sudo lsinitrd /boot/initramfs-"$(uname -r)".img | \
+  grep -E 'crypttab|systemd-tpm2|tpm2-tss|systemd-cryptsetup'
+```
+
+Reboot normally. Root should unlock without a prompt. To test the recovery path,
+disable Secure Boot temporarily in UEFI: TPM unlock should fail and the normal
+LUKS passphrase prompt should appear. Re-enable Secure Boot afterward; PCR 7
+should return to its enrolled value and automatic unlock should resume.
+
+PCR 7 deliberately tracks Secure Boot policy rather than individual Fedora
+kernels, so normal signed kernel and initramfs updates do not require
+re-enrollment. This is convenient but does not authenticate the separately
+stored initramfs; protecting that too requires a measured/signed UKI policy and
+update integration.
+
+### Remove TPM unlock
+
+Boot normally or unlock with the recovery passphrase, then remove only the TPM
+slot:
+
+```bash
+sudo systemd-cryptenroll --wipe-slot=tpm2 /dev/nvme0n1p3
+sudoedit /etc/crypttab  # remove only tpm2-device=auto
+sudo rm /etc/dracut.conf.d/20-tpm2-root.conf
+sudo dracut --force --kver "$(uname -r)"
+```
+
+## ASUS PG278Q through the Thunderbolt dock
+
+### Problem
+
+The PG278Q appears as a 640x480 display when connected through the Thunderbolt
+dock. The kernel detects DisplayPort as connected, but the i915 driver reads a
+zero-byte EDID through the Thunderbolt DisplayPort tunnel. The same dock,
+monitor, and cable work correctly on Windows.
+
+Confirm the failure with:
+
+```bash
+cat /sys/class/drm/card*-DP-1/status
+wc -c /sys/class/drm/card*-DP-1/edid
+cat /sys/class/drm/card*-DP-1/modes
+```
+
+The affected workstation reports `connected`, an EDID size of `0`, and only
+fallback display modes.
+
+### Fedora workaround
+
+The repository contains a custom 128-byte EDID with exact CVT Reduced Blanking
+timings for 2560x1440 at 120 Hz and 60 Hz. Install it as firmware, make dracut
+include it in future initramfs images, and tell the kernel to use it for DP-1:
+
+```bash
+cd ~/.dotfiles
+
+sudo install -Dm644 hyprland/.config/hypr/edid/pg278q.bin \
+  /usr/lib/firmware/edid/pg278q.bin
+sudo install -Dm644 etc/dracut.conf.d/10-pg278q-edid.conf \
+  /etc/dracut.conf.d/10-pg278q-edid.conf
+
+sudo grubby --update-kernel=ALL \
+  --args='drm.edid_firmware=DP-1:edid/pg278q.bin'
+
+sudo dracut --force --kver "$(uname -r)"
 systemctl reboot
 ```
 
-### Regenerating the EDID
+The dracut rule keeps the firmware embedded when Fedora builds initramfs images
+for later kernel updates.
 
-If the display is blank after reboot but `hyprctl monitors` shows it active, the
-timing is wrong. The PG278Q has a dedicated G-Sync module (not a standard scaler)
-that is very picky about signal timings. Rules:
-
-- DTDs **must** use exact CVT Reduced Blanking values from `cvt <w> <h> <hz> -r`
-- Sync polarity **must** be +H -V (flag byte `0x1A`). Using +H +V causes a
-  completely blank screen even though the compositor reports the mode as active.
-- V blanking must match CVT-R exactly — close-but-wrong values also blank out.
-
-Working CVT-R timings (from `cvt -r`):
-
-| Rate  | Pixel clock | H total | V total | Feasible through dock? |
-|-------|-------------|---------|---------|------------------------|
-| 60Hz  | 241.50 MHz  | 2720    | 1481    | Yes                    |
-| 120Hz | 497.25 MHz  | 2720    | 1525    | Yes (DP 1.2 HBR2 max ~540 MHz) |
-| 144Hz | 808.75 MHz  | 3584    | 1568    | No (exceeds DP 1.2 bandwidth)  |
-
-The EDID was generated with a Python script (see git history). The PG278Q is not
-in the [linuxhw/EDID](https://github.com/linuxhw/EDID) database. Always verify
-with `edid-decode` after regenerating.
-
-### Without a fallback display
-
-This is still fixable from a headless state. The 640x480 fallback (no EDID
-override) does produce a visible picture, and TTY/SSH both work. The dangerous
-case is a timing the G-Sync module fully rejects (blank screen) — have SSH
-access ready when experimenting with new timings.
-
-## joplin TUI
+### Verify after reboot
 
 ```bash
-# requires npm
-sudo pacman -S npm
+grep -o 'drm.edid_firmware=[^ ]*' /proc/cmdline
+wc -c /sys/class/drm/card*-DP-1/edid
+cat /sys/class/drm/card*-DP-1/modes
+```
 
-#install through npm
-NPM_CONFIG_PREFIX=~/.joplin-bin npm install --loglevel=error -g joplin
-# symlink to bin dir
-sudo ln -s ~/.joplin-bin/bin/joplin /usr/local/bin/joplin
+The kernel command line should contain
+`drm.edid_firmware=DP-1:edid/pg278q.bin`, the connector EDID should be 128 bytes,
+and `2560x1440` should be among its modes.
+
+### Timing details
+
+The PG278Q has a dedicated G-Sync module that rejects timings a normal scaler
+might accept. Its detailed timing descriptors must use exact CVT Reduced
+Blanking values and `+H -V` sync polarity (`0x1A`).
+
+| Rate | Pixel clock | H total | V total | Through DP 1.2 dock |
+|------|-------------|---------|---------|---------------------|
+| 60 Hz | 241.50 MHz | 2720 | 1481 | Yes |
+| 120 Hz | 497.25 MHz | 2720 | 1525 | Yes |
+| 144 Hz | 808.75 MHz | 3584 | 1568 | No |
+
+Regenerate and validate the committed binary with:
+
+```bash
+python3 hyprland/.config/hypr/edid/generate-pg278q.py
+edid-decode hyprland/.config/hypr/edid/pg278q.bin
+```
+
+`edid-decode` is optional and may need to be installed separately. The generator
+itself checks the EDID length and checksum.
+
+If a modified timing produces a blank screen, use the laptop panel, a TTY, or
+SSH to recover. The no-override state still produces a visible 640x480 fallback.
+
+### Remove the workaround
+
+```bash
+sudo grubby --update-kernel=ALL \
+  --remove-args='drm.edid_firmware=DP-1:edid/pg278q.bin'
+sudo rm /etc/dracut.conf.d/10-pg278q-edid.conf
+sudo rm /usr/lib/firmware/edid/pg278q.bin
+sudo dracut --force --kver "$(uname -r)"
 ```
