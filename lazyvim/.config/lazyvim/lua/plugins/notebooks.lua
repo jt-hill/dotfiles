@@ -1,3 +1,6 @@
+if true then
+    return {}
+end
 return {
     -- Molten: Jupyter kernel integration with inline output
     {
