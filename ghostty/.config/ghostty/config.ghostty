@@ -4,6 +4,7 @@ working-directory = home
 window-inherit-working-directory = true
 
 keybind = ctrl+shift+k=clear_screen
+config-file = scrollback-vim.ghostty
 
 theme = light:Catppuccin Latte,dark:TokyoNight Night
 
