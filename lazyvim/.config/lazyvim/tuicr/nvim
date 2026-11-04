@@ -1,0 +1,8 @@
+#!/bin/sh
+# Editor shim for tuicr running inside nvim (see lua/plugins/tuicr.lua).
+# It is named "nvim" so tuicr hands it "+LINE FILE"; it forwards the file to
+# the parent nvim instead of starting a nested one.
+line=1
+case "$1" in +*) line=${1#+}; shift ;; esac
+file=$(printf %s "$1" | sed "s/'/''/g")
+exec nvim --server "$NVIM" --remote-expr "v:lua.TuicrEdit('$file', $line)" >/dev/null
