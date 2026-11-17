@@ -23,40 +23,7 @@ return {
         },
     },
 
-    -- Conjure: evaluate forms straight from the buffer, results as virtual text
-    -- and in the HUD. Localleader is `\`, so <localleader>ee is `\ee`.
-    --
-    --   \ee  eval form under cursor      \eb  eval buffer
-    --   \er  eval root (top-level) form  \ef  eval file
-    --   \lv  open log in a vsplit        \lg  toggle log
-    {
-        "Olical/conjure",
-        ft = { "racket", "scheme" },
-        init = function()
-            -- Conjure otherwise claims python, lua, rust and sql buffers too.
-            vim.g["conjure#filetypes"] = { "racket", "scheme" }
-
-            -- `-I sicp` starts the REPL in the sicp language. The -e clause makes
-            -- SICP's mutable lists print as `(1 2 3)` instead of mcons chains;
-            -- those parameters live in racket/base, which sicp doesn't re-export
-            -- (and `-l racket/base` would replace the sicp namespace).
-            -- A list, not a string: Conjure splits strings on whitespace with no
-            -- shell, which would break up the -e program.
-            vim.g["conjure#client#racket#stdio#command"] = {
-                "racket",
-                "-I",
-                "sicp",
-                "-e",
-                "(#%require (only racket/base print-as-expression print-mpair-curly-braces))"
-                    .. " (print-as-expression #f) (print-mpair-curly-braces #f)",
-                "-i",
-            }
-
-            -- Conjure binds bare K to its own REPL doc lookup, shadowing LSP
-            -- hover. racket-langserver's hover is the better of the two.
-            vim.g["conjure#mapping#doc_word"] = false
-        end,
-    },
+    -- The REPL itself is iron.nvim (<leader>r*), configured in iron.nvim.lua.
 
     -- Structural editing. Racket is not an upstream-supported filetype, so it is
     -- added here and backed by queries/racket/paredit/forms.scm in this config.

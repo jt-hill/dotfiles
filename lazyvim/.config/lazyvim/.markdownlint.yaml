@@ -1,0 +1,2 @@
+# Global markdownlint config, passed to markdownlint-cli2 via lua/plugins/markdownlint.lua
+MD013: false # line length

@@ -25,6 +25,22 @@ local function python_command()
     return { "python3" }
 end
 
+-- Racket REPL for SICP (packages from racket.lua). `-I sicp` starts it in the
+-- sicp language. The -e clause makes SICP's mutable lists print as `(1 2 3)`
+-- instead of mcons chains; those parameters live in racket/base, which sicp
+-- doesn't re-export (and `-l racket/base` would replace the sicp namespace).
+local sicp_racket = {
+    command = {
+        "racket",
+        "-I",
+        "sicp",
+        "-e",
+        "(#%require (only racket/base print-as-expression print-mpair-curly-braces))"
+            .. " (print-as-expression #f) (print-mpair-curly-braces #f)",
+        "-i",
+    },
+}
+
 return {
     {
         "hkupty/iron.nvim",
@@ -49,6 +65,10 @@ return {
                             command = { "zsh" },
                             format = common.bracketed_paste,
                         },
+                        -- .scm files are filetype `scheme`; iron's own scheme
+                        -- default wants guile, so point both at Racket.
+                        racket = sicp_racket,
+                        scheme = sicp_racket,
                     },
                     -- One toggle_repl_with_cmd_<n> map per entry; first is default.
                     repl_open_cmd = {
